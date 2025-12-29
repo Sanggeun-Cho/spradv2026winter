@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0/EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.thc.sprbasic2025fall.mapper.PostimgMapper">
+<mapper namespace="com.thc.spradv2026winter.mapper.PostimgMapper">
 
 	<!---->
-	<select id="detail" parameterType="hashMap" resultType="com.thc.sprbasic2025fall.dto.PostimgDto$DetailResDto">
+	<select id="detail" parameterType="hashMap" resultType="com.thc.spradv2026winter.dto.PostimgDto$DetailResDto">
 		SELECT postimg.id
 			 , postimg.deleted
 			 , postimg.created_at as createdAt
@@ -21,12 +21,12 @@
         <if test = "postingId != null">AND postimg.posting_id = #{postingId}</if>
     </sql>
 
-    <select id="list" parameterType="hashMap" resultType="com.thc.sprbasic2025fall.dto.PostimgDto$DetailResDto">
+    <select id="list" parameterType="hashMap" resultType="com.thc.spradv2026winter.dto.PostimgDto$DetailResDto">
         SELECT postimg.id
         FROM postimg
         <include refid="commonWhere"/>
     </select>
-    <select id="pagedList" parameterType="hashMap" resultType="com.thc.sprbasic2025fall.dto.PostimgDto$DetailResDto">
+    <select id="pagedList" parameterType="hashMap" resultType="com.thc.spradv2026winter.dto.PostimgDto$DetailResDto">
         SELECT postimg.id
         FROM postimg
         <include refid="commonWhere"/>
@@ -43,7 +43,7 @@
         <include refid="commonWhere"/>
     </select>
 
-    <select id="scrollList" parameterType="hashMap" resultType="com.thc.sprbasic2025fall.dto.PostimgDto$DetailResDto">
+    <select id="scrollList" parameterType="hashMap" resultType="com.thc.spradv2026winter.dto.PostimgDto$DetailResDto">
         SELECT postimg.id
         FROM postimg
         <include refid="commonWhere"/>

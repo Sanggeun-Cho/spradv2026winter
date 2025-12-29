@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0/EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.thc.sprbasic2025fall.mapper.PostcmtMapper">
+<mapper namespace="com.thc.spradv2026winter.mapper.PostcmtMapper">
 
 	<!---->
-	<select id="detail" parameterType="hashMap" resultType="com.thc.sprbasic2025fall.dto.PostcmtDto$DetailResDto">
+	<select id="detail" parameterType="hashMap" resultType="com.thc.spradv2026winter.dto.PostcmtDto$DetailResDto">
 		SELECT postcmt.id
 			 , postcmt.deleted
 			 , postcmt.created_at as createdAt
@@ -29,12 +29,12 @@
         <if test = "userId != null">AND postcmt.user_id = #{userId}</if>
     </sql>
 
-    <select id="list" parameterType="hashMap" resultType="com.thc.sprbasic2025fall.dto.PostcmtDto$DetailResDto">
+    <select id="list" parameterType="hashMap" resultType="com.thc.spradv2026winter.dto.PostcmtDto$DetailResDto">
         SELECT postcmt.id
         FROM postcmt
         <include refid="commonWhere"/>
     </select>
-    <select id="pagedList" parameterType="hashMap" resultType="com.thc.sprbasic2025fall.dto.PostcmtDto$DetailResDto">
+    <select id="pagedList" parameterType="hashMap" resultType="com.thc.spradv2026winter.dto.PostcmtDto$DetailResDto">
         SELECT postcmt.id
         FROM postcmt
         <include refid="commonWhere"/>
@@ -51,7 +51,7 @@
         <include refid="commonWhere"/>
     </select>
 
-    <select id="scrollList" parameterType="hashMap" resultType="com.thc.sprbasic2025fall.dto.PostcmtDto$DetailResDto">
+    <select id="scrollList" parameterType="hashMap" resultType="com.thc.spradv2026winter.dto.PostcmtDto$DetailResDto">
         SELECT postcmt.id
         FROM postcmt
         <include refid="commonWhere"/>

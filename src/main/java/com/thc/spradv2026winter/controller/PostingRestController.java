@@ -1,0 +1,58 @@
+package com.thc.spradv2026winter.controller;
+
+import com.thc.spradv2026winter.dto.DefaultDto;
+import com.thc.spradv2026winter.dto.PostingDto;
+import com.thc.spradv2026winter.service.PostingService;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RequiredArgsConstructor
+@RequestMapping("/api/posting")
+@RestController
+public class PostingRestController {
+
+    final PostingService postingService;
+
+    @PostMapping("")
+    public ResponseEntity<DefaultDto.CreateResDto> create(@RequestBody PostingDto.CreateReqDto param, HttpServletRequest request) {
+        //return postingService.create(param);
+        //return ResponseEntity.status(HttpStatus.OK).body(postingService.create(param));
+        long userId = Long.parseLong(request.getAttribute("userId").toString());
+        System.out.println("controller: userId = " + userId);
+        param.setUserId(userId);
+
+        return ResponseEntity.ok(postingService.create(param));
+    }
+    @PutMapping("")
+    public ResponseEntity<Void> update(@RequestBody PostingDto.UpdateReqDto param) {
+        postingService.update(param);
+        return ResponseEntity.ok().build();
+    }
+    @DeleteMapping("")
+    public ResponseEntity<Void> delete(@RequestBody PostingDto.UpdateReqDto param) {
+        postingService.delete(param);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("")
+    public ResponseEntity<PostingDto.DetailResDto> detail(DefaultDto.DetailReqDto param) {
+        return ResponseEntity.ok(postingService.detail(param));
+    }
+    @GetMapping("/list")
+    public ResponseEntity<List<PostingDto.DetailResDto>> list(PostingDto.ListReqDto param) {
+        return ResponseEntity.ok(postingService.list(param));
+    }
+    @GetMapping("/pagedList")
+    public ResponseEntity<DefaultDto.PagedListResDto> pagedList(PostingDto.PagedListReqDto param) {
+        return ResponseEntity.ok(postingService.pagedList(param));
+    }
+    @GetMapping("/scrollList")
+    public ResponseEntity<List<PostingDto.DetailResDto>> scrollList(PostingDto.ScrollListReqDto param) {
+        return ResponseEntity.ok(postingService.scrollList(param));
+    }
+
+}

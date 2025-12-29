@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0/EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.thc.sprbasic2025fall.mapper.PostlikeMapper">
+<mapper namespace="com.thc.spradv2026winter.mapper.PostlikeMapper">
 
 	<!---->
-	<select id="detail" parameterType="hashMap" resultType="com.thc.sprbasic2025fall.dto.PostlikeDto$DetailResDto">
+	<select id="detail" parameterType="hashMap" resultType="com.thc.spradv2026winter.dto.PostlikeDto$DetailResDto">
 		SELECT postlike.id
 			 , postlike.deleted
 			 , postlike.created_at as createdAt
@@ -28,12 +28,12 @@
         <if test = "userId != null">AND postlike.user_id = #{userId}</if>
     </sql>
 
-    <select id="list" parameterType="hashMap" resultType="com.thc.sprbasic2025fall.dto.PostlikeDto$DetailResDto">
+    <select id="list" parameterType="hashMap" resultType="com.thc.spradv2026winter.dto.PostlikeDto$DetailResDto">
         SELECT postlike.id
         FROM postlike
         <include refid="commonWhere"/>
     </select>
-    <select id="pagedList" parameterType="hashMap" resultType="com.thc.sprbasic2025fall.dto.PostlikeDto$DetailResDto">
+    <select id="pagedList" parameterType="hashMap" resultType="com.thc.spradv2026winter.dto.PostlikeDto$DetailResDto">
         SELECT postlike.id
         FROM postlike
         <include refid="commonWhere"/>
@@ -50,7 +50,7 @@
         <include refid="commonWhere"/>
     </select>
 
-    <select id="scrollList" parameterType="hashMap" resultType="com.thc.sprbasic2025fall.dto.PostlikeDto$DetailResDto">
+    <select id="scrollList" parameterType="hashMap" resultType="com.thc.spradv2026winter.dto.PostlikeDto$DetailResDto">
         SELECT postlike.id
         FROM postlike
         <include refid="commonWhere"/>

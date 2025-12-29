@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0/EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.thc.sprbasic2025fall.mapper.PostingMapper">
+<mapper namespace="com.thc.spradv2026winter.mapper.PostingMapper">
 
 	<!---->
 
 
-	<select id="detail" parameterType="hashMap" resultType="com.thc.sprbasic2025fall.dto.PostingDto$DetailResDto">
+	<select id="detail" parameterType="hashMap" resultType="com.thc.spradv2026winter.dto.PostingDto$DetailResDto">
         SELECT posting.id
              , posting.deleted
              , posting.created_at as createdAt
@@ -32,12 +32,12 @@
         <if test = "title != null and title !=''">AND posting.title LIKE CONCAT('%', #{title}, '%')</if>
     </sql>
 
-    <select id="list" parameterType="hashMap" resultType="com.thc.sprbasic2025fall.dto.PostingDto$DetailResDto">
+    <select id="list" parameterType="hashMap" resultType="com.thc.spradv2026winter.dto.PostingDto$DetailResDto">
         SELECT posting.id
         FROM posting
         <include refid="commonWhere"/>
     </select>
-    <select id="pagedList" parameterType="hashMap" resultType="com.thc.sprbasic2025fall.dto.PostingDto$DetailResDto">
+    <select id="pagedList" parameterType="hashMap" resultType="com.thc.spradv2026winter.dto.PostingDto$DetailResDto">
         SELECT posting.id
         FROM posting
         <include refid="commonWhere"/>
@@ -54,7 +54,7 @@
         <include refid="commonWhere"/>
     </select>
 
-    <select id="scrollList" parameterType="hashMap" resultType="com.thc.sprbasic2025fall.dto.PostingDto$DetailResDto">
+    <select id="scrollList" parameterType="hashMap" resultType="com.thc.spradv2026winter.dto.PostingDto$DetailResDto">
         SELECT posting.id
         FROM posting
         <include refid="commonWhere"/>
