@@ -19,7 +19,7 @@ public class PostingRestController {
 
     @PostMapping("")
     public ResponseEntity<DefaultDto.CreateResDto> create(@RequestBody PostingDto.CreateReqDto param, HttpServletRequest request) {
-        //return postingService.create(param);
+        // return postingService.create(param);
         //return ResponseEntity.status(HttpStatus.OK).body(postingService.create(param));
         long userId = Long.parseLong(request.getAttribute("userId").toString());
         System.out.println("controller: userId = " + userId);
