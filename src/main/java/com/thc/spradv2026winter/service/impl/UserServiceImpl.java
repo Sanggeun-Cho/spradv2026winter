@@ -1,9 +1,11 @@
 package com.thc.spradv2026winter.service.impl;
 
+import com.thc.spradv2026winter.domain.RefreshToken;
 import com.thc.spradv2026winter.domain.User;
 import com.thc.spradv2026winter.dto.DefaultDto;
 import com.thc.spradv2026winter.dto.UserDto;
 import com.thc.spradv2026winter.mapper.UserMapper;
+import com.thc.spradv2026winter.repository.RefreshTokenRepository;
 import com.thc.spradv2026winter.repository.UserRepository;
 import com.thc.spradv2026winter.service.UserService;
 import com.thc.spradv2026winter.util.TokenFactory;
@@ -20,6 +22,8 @@ public class UserServiceImpl implements UserService {
 
     final UserRepository userRepository;
     final UserMapper userMapper;
+    final RefreshTokenRepository refreshTokenRepository;
+    final TokenFactory tokenFactory;
 
 
     @Override
@@ -30,8 +34,16 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("no data");
         }
 
-        String refreshToken = TokenFactory.createRefreshToken(user.getId());
-        // System.out.println("refreshToken: " + refreshToken);
+        String refreshToken = tokenFactory.createRefreshToken(user.getId());
+        System.out.println("refreshToken: " + refreshToken);
+
+        // 중복 로그인 방지 -> 새로 로그인 하면 모든 리프레시 토큰 삭제
+        List<RefreshToken> refreshTokens = refreshTokenRepository.findByUserId(user.getId());
+        refreshTokenRepository.deleteAll(refreshTokens);
+
+        // DB에 저장
+        RefreshToken entity = RefreshToken.of(user.getId(), refreshToken);
+        refreshTokenRepository.save(entity);
 
         return UserDto.LoginResDto.builder()
                 .refreshToken(refreshToken)

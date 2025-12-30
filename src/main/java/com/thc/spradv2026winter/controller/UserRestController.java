@@ -21,7 +21,8 @@ public class UserRestController {
     public ResponseEntity<Void> login(@RequestBody UserDto.LoginReqDto param) {
         String refreshToken = userService.login(param).getRefreshToken();
 
-        return ResponseEntity.ok().header("RefreshToken", refreshToken).build();
+        // 토큰의 출처 검증?을 위해 앞에 Bearer를 붙임
+        return ResponseEntity.ok().header("RefreshToken", "Bearer " + refreshToken).build();
     }
     /**/
 

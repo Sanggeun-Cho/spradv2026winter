@@ -1,17 +1,26 @@
 package com.thc.spradv2026winter.util;
 
+import com.thc.spradv2026winter.domain.RefreshToken;
+import com.thc.spradv2026winter.repository.RefreshTokenRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
+@RequiredArgsConstructor
+@Component
 public class TokenFactory {
-    // 발급 만료 시간 Term
-    static int refreshTokenValidityHour = 2;
+    final RefreshTokenRepository refreshTokenRepository;
 
-    // 리프레시 토큰 생성
-    public static String createRefreshToken(Long userId) {
+    static int refreshTokenValidityHour = 12;
+    static int accessTokenValidityHour = 1;
+
+    // 공통 토큰 생성
+    public String createToken(Long userId, int termHour) {
         LocalDateTime now = LocalDateTime.now();
 
-        now = now.plusHours(refreshTokenValidityHour);
+        now = now.plusHours(termHour);
 
         String token = null;
 
@@ -24,8 +33,37 @@ public class TokenFactory {
         return token;
     }
 
+    // 리프레시 토큰 생성
+    public String createRefreshToken(Long userId) {
+        return createToken(userId, refreshTokenValidityHour);
+    }
+
+    // 엑세스 토큰 생성
+    public String createAccessToken(String refreshToken) {
+        Long userId = validateToken(refreshToken);
+
+        RefreshToken entity = refreshTokenRepository.findByContent(refreshToken);
+
+        if(entity == null) {
+            return null;
+        }
+
+        Long userIdFromToken = entity.getUserId();
+        System.out.println("userIdFromToken: " + userIdFromToken);
+        if(!userIdFromToken.equals(userId)){
+            return null;
+        }
+
+        System.out.println("userId: " + userId);
+        if(userId == null){
+            return null;
+        }
+
+        return createToken(userId, accessTokenValidityHour);
+    }
+
     // 연습용 Refresh 토큰 복호화
-    public static Long validateToken(String token) { // userId만 돌려줄거라 Long
+    public Long validateToken(String token) { // userId만 돌려줄거라 Long
         String info = null;
 
         try {
