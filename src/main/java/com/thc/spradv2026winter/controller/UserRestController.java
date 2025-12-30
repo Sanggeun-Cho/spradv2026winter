@@ -3,6 +3,7 @@ package com.thc.spradv2026winter.controller;
 import com.thc.spradv2026winter.dto.DefaultDto;
 import com.thc.spradv2026winter.dto.UserDto;
 import com.thc.spradv2026winter.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +17,11 @@ public class UserRestController {
 
     final UserService userService;
 
-    @PostMapping("/login")
-    public ResponseEntity<DefaultDto.CreateResDto> login(@RequestBody UserDto.LoginReqDto param) {
-        return ResponseEntity.ok(userService.login(param));
+    @PostMapping("/login") // 토큰 값 헤더에 담아서 주기
+    public ResponseEntity<Void> login(@RequestBody UserDto.LoginReqDto param) {
+        String refreshToken = userService.login(param).getRefreshToken();
+
+        return ResponseEntity.ok().header("RefreshToken", refreshToken).build();
     }
     /**/
 

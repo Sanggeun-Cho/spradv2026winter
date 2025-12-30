@@ -6,11 +6,13 @@ import com.thc.spradv2026winter.dto.UserDto;
 import com.thc.spradv2026winter.mapper.UserMapper;
 import com.thc.spradv2026winter.repository.UserRepository;
 import com.thc.spradv2026winter.service.UserService;
+import com.thc.spradv2026winter.util.TokenFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -21,12 +23,19 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public DefaultDto.CreateResDto login(UserDto.LoginReqDto param) {
+    public UserDto.LoginResDto login(UserDto.LoginReqDto param) {
         User user = userRepository.findByUsernameAndPassword(param.getUsername(), param.getPassword());
-        if(user == null){
+
+        if(user == null) {
             throw new RuntimeException("no data");
         }
-        return DefaultDto.CreateResDto.builder().id(user.getId()).build();
+
+        String refreshToken = TokenFactory.createRefreshToken(user.getId());
+        // System.out.println("refreshToken: " + refreshToken);
+
+        return UserDto.LoginResDto.builder()
+                .refreshToken(refreshToken)
+                .build();
     }
 
     /**/

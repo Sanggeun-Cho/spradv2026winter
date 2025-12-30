@@ -39,6 +39,9 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    /* AES256 */
+    implementation 'commons-codec:commons-codec:1.5'
 }
 
 tasks.named('test') {
