@@ -39,15 +39,20 @@ public class PostingServiceImpl implements PostingService {
     }
 
     @Override
-    public void update(PostingDto.UpdateReqDto param) {
+    public void update(PostingDto.UpdateReqDto param, Long userId) {
         Posting posting = postingRepository.findById(param.getId()).orElseThrow(() -> new RuntimeException("no data"));
+
+        if(!userId.equals(posting.getUserId())) {
+            throw new RuntimeException("you don't have permission to update this posting");
+        }
+
         posting.update(param);
         postingRepository.save(posting);
     }
 
     @Override
-    public void delete(PostingDto.UpdateReqDto param) {
-        update(PostingDto.UpdateReqDto.builder().id(param.getId()).deleted(true).build());
+    public void delete(PostingDto.UpdateReqDto param, Long userId) {
+        update(PostingDto.UpdateReqDto.builder().id(param.getId()).deleted(true).build(), userId);
     }
 
     public PostingDto.DetailResDto get(DefaultDto.DetailReqDto param) {

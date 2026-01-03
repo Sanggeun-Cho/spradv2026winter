@@ -15,12 +15,21 @@ public class TokenFactory {
 
     static int refreshTokenValidityHour = 12;
     static int accessTokenValidityHour = 1;
+    // Access 토큰이 만료되면 생기는 일을 확인하기 위해 1분 텀으로 테스트
+//    static int accessTokenValidityTerm = 1;
 
     // 공통 토큰 생성
     public String createToken(Long userId, int termHour) {
         LocalDateTime now = LocalDateTime.now();
 
         now = now.plusHours(termHour);
+
+        // Test 용
+//        if(termHour == accessTokenValidityTerm) {
+//            now = now.plusMinutes(1);
+//        } else {
+//            now = now.plusHours(termHour);
+//        }
 
         String token = null;
 
@@ -40,7 +49,7 @@ public class TokenFactory {
 
     // 엑세스 토큰 생성
     public String createAccessToken(String refreshToken) {
-        Long userId = validateToken(refreshToken);
+        Long userId = validateToken(refreshToken); // 리프레시 토큰
 
         RefreshToken entity = refreshTokenRepository.findByContent(refreshToken);
 
@@ -60,6 +69,17 @@ public class TokenFactory {
         }
 
         return createToken(userId, accessTokenValidityHour);
+
+//        return createToken(userId, accessTokenValidityTerm);
+    }
+
+    public Long validateAccessToken(String token) {
+        Long userId = validateToken(token);
+        if(userId == null) {
+            throw new RuntimeException("please check your Refresh Token");
+        }
+
+        return userId;
     }
 
     // 연습용 Refresh 토큰 복호화
