@@ -9,7 +9,7 @@ import lombok.Setter;
 
 @Getter
 @Entity
-public class User extends AuditingFileds{
+public class User extends AuditingFields {
     @Setter @Column(nullable = false, unique = true) String username;
     @Setter @Column(nullable = false) String password;
     @Setter String name;

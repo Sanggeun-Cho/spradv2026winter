@@ -72,7 +72,16 @@ public class PostingRestController {
     }
 
     @GetMapping("")
-    public ResponseEntity<PostingDto.DetailResDto> detail(DefaultDto.DetailReqDto param) {
+    public ResponseEntity<PostingDto.DetailResDto> detail(DefaultDto.DetailReqDto param, HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        System.out.println("userId = " + userId);
+
+        if(userId == null) {
+            // 로그인 안됐으면
+            System.out.println("userId is null");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
         return ResponseEntity.ok(postingService.detail(param));
     }
     @GetMapping("/list")

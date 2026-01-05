@@ -226,10 +226,14 @@ countlike : <input type="number" id="input_countlike" />
     }
 
     function detail_posting(){
+        let accessToken = localStorage.getItem("accessToken") + "";
         $.ajax({
             //
             url: '/api/posting',
             method: 'GET',
+            beforeSend : function(xhr) {
+                xhr.setRequestHeader("Authorization", accessToken);
+            },
             data : {
                 id : temp_id
             },
