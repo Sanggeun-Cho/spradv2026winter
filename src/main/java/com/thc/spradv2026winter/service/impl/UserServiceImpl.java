@@ -1,15 +1,20 @@
 package com.thc.spradv2026winter.service.impl;
 
 import com.thc.spradv2026winter.domain.RefreshToken;
+import com.thc.spradv2026winter.domain.RoleType;
 import com.thc.spradv2026winter.domain.User;
+import com.thc.spradv2026winter.domain.UserRoleType;
 import com.thc.spradv2026winter.dto.DefaultDto;
 import com.thc.spradv2026winter.dto.UserDto;
 import com.thc.spradv2026winter.mapper.UserMapper;
 import com.thc.spradv2026winter.repository.RefreshTokenRepository;
+import com.thc.spradv2026winter.repository.RoleTypeRepository;
 import com.thc.spradv2026winter.repository.UserRepository;
+import com.thc.spradv2026winter.repository.UserRoleTypeRepository;
 import com.thc.spradv2026winter.service.UserService;
 import com.thc.spradv2026winter.util.TokenFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,8 +27,11 @@ public class UserServiceImpl implements UserService {
 
     final UserRepository userRepository;
     final UserMapper userMapper;
+    final BCryptPasswordEncoder bCryptPasswordEncoder;
     final RefreshTokenRepository refreshTokenRepository;
     final TokenFactory tokenFactory;
+    final RoleTypeRepository roleTypeRepository;
+    final UserRoleTypeRepository userRoleTypeRepository;
 
 
     @Override
@@ -63,7 +71,21 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("already exist");
         }
 
-        return userRepository.save(param.toEntity()).toCreateResDto();
+        param.setPassword(bCryptPasswordEncoder.encode(param.getPassword()));
+        User newUser = userRepository.save(param.toEntity());
+
+        // 개발 편의용 코드
+        String typeName = "ROLE_USER";
+        RoleType roleType = roleTypeRepository.findByTypeName(typeName);
+        if(roleType == null){
+            roleType = RoleType.of("user", typeName);
+            roleTypeRepository.save(roleType);
+        }
+
+        UserRoleType userRoleType = UserRoleType.of(newUser, roleType);
+        userRoleTypeRepository.save(userRoleType);
+
+        return newUser.toCreateResDto();
     }
 
     @Override

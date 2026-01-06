@@ -61,9 +61,7 @@ images :
         if(refreshToken === null || refreshToken + "" === "" || refreshToken + "" === "undefined"){
 
         } else {
-            if(refreshToken.startsWith("Bearer ")){
-                is_loggedin = true;
-            }
+            is_loggedin = true;
         }
 
         if(!is_loggedin){

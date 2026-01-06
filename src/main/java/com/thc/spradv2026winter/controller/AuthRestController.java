@@ -1,5 +1,7 @@
 package com.thc.spradv2026winter.controller;
 
+import com.thc.spradv2026winter.security.AuthService;
+import com.thc.spradv2026winter.security.ExternalProperties;
 import com.thc.spradv2026winter.util.TokenFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -13,23 +15,19 @@ import java.util.List;
 @RequestMapping("/api/auth")
 @RestController
 public class AuthRestController {
-    final TokenFactory tokenFactory;
+//    final TokenFactory tokenFactory;
+    final AuthService authService;
+    final ExternalProperties externalProperties;
 
     @PostMapping("") // 토큰 값 헤더에 담아서 주기
     public ResponseEntity<Void> access(HttpServletRequest request) {
         String refreshToken = request.getHeader("RefreshToken");
-        if(!refreshToken.startsWith("Bearer")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        String accessToken = null;
+        if(refreshToken != null && refreshToken.startsWith(externalProperties.getTokenPrefix())) {
+            String token = refreshToken.substring(externalProperties.getTokenPrefix().length());
+            accessToken = authService.issueAccessToken(token);
         }
 
-        refreshToken = refreshToken.substring(7);
-
-        String accessToken = tokenFactory.createAccessToken(refreshToken);
-
-        if(accessToken == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        return ResponseEntity.ok().header("Authorization", "Bearer " +  accessToken).build();
+        return ResponseEntity.ok().header(externalProperties.getAccessKey(), externalProperties.getTokenPrefix() +  accessToken).build();
     }
 }

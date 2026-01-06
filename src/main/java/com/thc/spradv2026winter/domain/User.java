@@ -2,10 +2,12 @@ package com.thc.spradv2026winter.domain;
 
 import com.thc.spradv2026winter.dto.DefaultDto;
 import com.thc.spradv2026winter.dto.UserDto;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -17,6 +19,16 @@ public class User extends AuditingFields {
     @Setter String phone;
     @Setter String birth;
     @Setter String gender;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    private List<UserRoleType> userRoleType = new ArrayList<>();
+
+    public List<UserRoleType> getRoleList() {
+        if(!this.userRoleType.isEmpty()) {
+            return userRoleType;
+        }
+        return new ArrayList<>();
+    }
 
     protected User(){}
     private User(String username, String password, String name, String nick, String phone, String birth, String gender) {
