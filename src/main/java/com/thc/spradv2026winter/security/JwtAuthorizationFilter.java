@@ -47,7 +47,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
         Long userId = authService.verifyAccessToken(accessToken);
 
-        User userEntity = userRepository.findEntityGraphRoleTypeById(userId).orElseThrow(new Supplier<NoMatchingDataException>() {
+        User userEntity = userRepository.findById(userId).orElseThrow(new Supplier<NoMatchingDataException>() {
             @Override
             public NoMatchingDataException get() {
                 return new NoMatchingDataException("id : " + userId);

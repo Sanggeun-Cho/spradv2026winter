@@ -15,7 +15,7 @@ import java.util.List;
 @RequestMapping("/api/auth")
 @RestController
 public class AuthRestController {
-//    final TokenFactory tokenFactory;
+    //    final TokenFactory tokenFactory;
     final AuthService authService;
     final ExternalProperties externalProperties;
 

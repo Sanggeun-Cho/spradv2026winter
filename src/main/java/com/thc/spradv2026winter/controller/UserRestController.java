@@ -2,10 +2,13 @@ package com.thc.spradv2026winter.controller;
 
 import com.thc.spradv2026winter.dto.DefaultDto;
 import com.thc.spradv2026winter.dto.UserDto;
+import com.thc.spradv2026winter.security.PrincipalDetails;
 import com.thc.spradv2026winter.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,45 +20,56 @@ public class UserRestController {
 
     final UserService userService;
 
-    @PostMapping("/login") // 토큰 값 헤더에 담아서 주기
-    public ResponseEntity<Void> login(@RequestBody UserDto.LoginReqDto param) {
-        String refreshToken = userService.login(param).getRefreshToken();
+    public Long getUserId(PrincipalDetails principalDetails) {
+        if(principalDetails != null && principalDetails.getUser() != null) {
+            return principalDetails.getUser().getId();
+        }
 
-        // 토큰의 출처 검증?을 위해 앞에 Bearer를 붙임
-        return ResponseEntity.ok().header("RefreshToken", "Bearer " + refreshToken).build();
+        return null;
     }
-    /**/
 
+    @PreAuthorize("hasRole('USER')")
     @PostMapping("")
-    public ResponseEntity<DefaultDto.CreateResDto> create(@RequestBody UserDto.CreateReqDto param) {
-        return ResponseEntity.ok(userService.create(param));
+    public ResponseEntity<DefaultDto.CreateResDto> create(@RequestBody UserDto.CreateReqDto param, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return ResponseEntity.ok(userService.create(param, getUserId(principalDetails)));
     }
+
+    @PreAuthorize("hasRole('USER')")
     @PutMapping("")
-    public ResponseEntity<Void> update(@RequestBody UserDto.UpdateReqDto param) {
-        userService.update(param);
-        return ResponseEntity.ok().build();
-    }
-    @DeleteMapping("")
-    public ResponseEntity<Void> delete(@RequestBody UserDto.UpdateReqDto param) {
-        userService.delete(param);
+    public ResponseEntity<Void> update(@RequestBody UserDto.UpdateReqDto param, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        userService.update(param, getUserId(principalDetails));
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("hasRole('USER')")
+    @DeleteMapping("")
+    public ResponseEntity<Void> delete(@RequestBody UserDto.UpdateReqDto param, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        userService.delete(param, getUserId(principalDetails));
+        return ResponseEntity.ok().build();
+    }
+
+    @PreAuthorize("permitAll()")
     @GetMapping("")
-    public ResponseEntity<UserDto.DetailResDto> detail(DefaultDto.DetailReqDto param) {
-        return ResponseEntity.ok(userService.detail(param));
+    public ResponseEntity<UserDto.DetailResDto> detail(DefaultDto.DetailReqDto param, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return ResponseEntity.ok(userService.detail(param, getUserId(principalDetails)));
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/list")
-    public ResponseEntity<List<UserDto.DetailResDto>> list(UserDto.ListReqDto param) {
-        return ResponseEntity.ok(userService.list(param));
+    public ResponseEntity<List<UserDto.DetailResDto>> list(UserDto.ListReqDto param, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return ResponseEntity.ok(userService.list(param, getUserId(principalDetails)));
     }
+
+    @PreAuthorize("permitAll()")
     @GetMapping("/pagedList")
-    public ResponseEntity<DefaultDto.PagedListResDto> pagedList(UserDto.PagedListReqDto param) {
-        return ResponseEntity.ok(userService.pagedList(param));
+    public ResponseEntity<DefaultDto.PagedListResDto> pagedList(UserDto.PagedListReqDto param, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return ResponseEntity.ok(userService.pagedList(param, getUserId(principalDetails)));
     }
+
+    @PreAuthorize("permitAll()")
     @GetMapping("/scrollList")
-    public ResponseEntity<List<UserDto.DetailResDto>> scrollList(UserDto.ScrollListReqDto param) {
-        return ResponseEntity.ok(userService.scrollList(param));
+    public ResponseEntity<List<UserDto.DetailResDto>> scrollList(UserDto.ScrollListReqDto param, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        return ResponseEntity.ok(userService.scrollList(param, getUserId(principalDetails)));
     }
 
 }

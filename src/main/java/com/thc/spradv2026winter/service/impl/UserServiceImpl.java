@@ -1,25 +1,17 @@
 package com.thc.spradv2026winter.service.impl;
 
-import com.thc.spradv2026winter.domain.RefreshToken;
-import com.thc.spradv2026winter.domain.RoleType;
 import com.thc.spradv2026winter.domain.User;
-import com.thc.spradv2026winter.domain.UserRoleType;
 import com.thc.spradv2026winter.dto.DefaultDto;
 import com.thc.spradv2026winter.dto.UserDto;
 import com.thc.spradv2026winter.mapper.UserMapper;
-import com.thc.spradv2026winter.repository.RefreshTokenRepository;
-import com.thc.spradv2026winter.repository.RoleTypeRepository;
 import com.thc.spradv2026winter.repository.UserRepository;
-import com.thc.spradv2026winter.repository.UserRoleTypeRepository;
 import com.thc.spradv2026winter.service.UserService;
-import com.thc.spradv2026winter.util.TokenFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -28,40 +20,14 @@ public class UserServiceImpl implements UserService {
     final UserRepository userRepository;
     final UserMapper userMapper;
     final BCryptPasswordEncoder bCryptPasswordEncoder;
-    final RefreshTokenRepository refreshTokenRepository;
-    final TokenFactory tokenFactory;
-    final RoleTypeRepository roleTypeRepository;
-    final UserRoleTypeRepository userRoleTypeRepository;
-
 
     @Override
-    public UserDto.LoginResDto login(UserDto.LoginReqDto param) {
-        User user = userRepository.findByUsernameAndPassword(param.getUsername(), param.getPassword());
-
-        if(user == null) {
-            throw new RuntimeException("no data");
-        }
-
-        String refreshToken = tokenFactory.createRefreshToken(user.getId());
-        System.out.println("refreshToken: " + refreshToken);
-
-        // 중복 로그인 방지 -> 새로 로그인 하면 모든 리프레시 토큰 삭제
-        List<RefreshToken> refreshTokens = refreshTokenRepository.findByUserId(user.getId());
-        refreshTokenRepository.deleteAll(refreshTokens);
-
-        // DB에 저장
-        RefreshToken entity = RefreshToken.of(user.getId(), refreshToken);
-        refreshTokenRepository.save(entity);
-
-        return UserDto.LoginResDto.builder()
-                .refreshToken(refreshToken)
-                .build();
+    public DefaultDto.CreateResDto signup(UserDto.CreateReqDto param, Long reqUserId){
+        return create(param, reqUserId);
     }
 
-    /**/
-
     @Override
-    public DefaultDto.CreateResDto create(UserDto.CreateReqDto param) {
+    public DefaultDto.CreateResDto create(UserDto.CreateReqDto param, Long reqUserId) {
         User user = userRepository.findByUsername(param.getUsername());
         if(user != null){
             throw new RuntimeException("already exist");
@@ -74,73 +40,54 @@ public class UserServiceImpl implements UserService {
         param.setPassword(bCryptPasswordEncoder.encode(param.getPassword()));
         User newUser = userRepository.save(param.toEntity());
 
-        // 개발 편의용 코드
-        String typeName = "ROLE_USER";
-        RoleType roleType = roleTypeRepository.findByTypeName(typeName);
-        if(roleType == null){
-            roleType = RoleType.of("user", typeName);
-            roleTypeRepository.save(roleType);
-        }
-        //
-
-        UserRoleType userRoleType = UserRoleType.of(newUser, roleType);
-        userRoleTypeRepository.save(userRoleType);
-
         return newUser.toCreateResDto();
     }
 
     @Override
-    public void update(UserDto.UpdateReqDto param) {
+    public void update(UserDto.UpdateReqDto param, Long reqUserId) {
         User user = userRepository.findById(param.getId()).orElseThrow(() -> new RuntimeException("no data"));
         user.update(param);
         userRepository.save(user);
     }
 
     @Override
-    public void delete(UserDto.UpdateReqDto param) {
-        update(UserDto.UpdateReqDto.builder().id(param.getId()).deleted(true).build());
+    public void delete(UserDto.UpdateReqDto param, Long reqUserId) {
+        update(UserDto.UpdateReqDto.builder().id(param.getId()).deleted(true).build(), reqUserId);
     }
 
-    public UserDto.DetailResDto get(DefaultDto.DetailReqDto param) {
-//        User user = userRepository.findById(param.getId()).orElseThrow(() -> new RuntimeException("no data"));
-//        return UserDto.DetailResDto.builder()
-//                .id(user.getId())
-//                .deleted(user.getDeleted())
-//                .title(user.getTitle())
-//                .content(user.getContent())
-//                .build();
+    public UserDto.DetailResDto get(DefaultDto.DetailReqDto param, Long reqUserId) {
         UserDto.DetailResDto res = userMapper.detail(param.getId());
         return res;
     }
 
     @Override
-    public UserDto.DetailResDto detail(DefaultDto.DetailReqDto param) {
-        return get(param);
+    public UserDto.DetailResDto detail(DefaultDto.DetailReqDto param, Long reqUserId) {
+        return get(param, reqUserId);
     }
 
-    public List<UserDto.DetailResDto> addlist(List<UserDto.DetailResDto> list) {
+    public List<UserDto.DetailResDto> addlist(List<UserDto.DetailResDto> list, Long reqUserId) {
         List<UserDto.DetailResDto> newList = new ArrayList<>();
         for (UserDto.DetailResDto user : list) {
-            newList.add(get(DefaultDto.DetailReqDto.builder().id(user.getId()).build()));
+            newList.add(get(DefaultDto.DetailReqDto.builder().id(user.getId()).build(), reqUserId));
         }
         return newList;
     }
 
     @Override
-    public List<UserDto.DetailResDto> list(UserDto.ListReqDto param) {
+    public List<UserDto.DetailResDto> list(UserDto.ListReqDto param, Long reqUserId) {
         List<UserDto.DetailResDto> list = new ArrayList<>();
         List<UserDto.DetailResDto> users = userMapper.list(param);
-        return addlist(users);
+        return addlist(users, reqUserId);
     }
     @Override
-    public DefaultDto.PagedListResDto pagedList(UserDto.PagedListReqDto param) {
+    public DefaultDto.PagedListResDto pagedList(UserDto.PagedListReqDto param, Long reqUserId) {
         DefaultDto.PagedListResDto res = param.init(userMapper.listCount(param));
-        res.setList(addlist(userMapper.pagedList(param)));
+        res.setList(addlist(userMapper.pagedList(param), reqUserId));
         return res;
     }
 
     @Override
-    public List<UserDto.DetailResDto> scrollList(UserDto.ScrollListReqDto param) {
-        return addlist(userMapper.scrollList(param));
+    public List<UserDto.DetailResDto> scrollList(UserDto.ScrollListReqDto param, Long reqUserId) {
+        return addlist(userMapper.scrollList(param), reqUserId);
     }
 }

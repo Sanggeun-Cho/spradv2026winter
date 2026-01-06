@@ -2,11 +2,9 @@ package com.thc.spradv2026winter.service.impl;
 
 import com.thc.spradv2026winter.domain.Posting;
 import com.thc.spradv2026winter.dto.DefaultDto;
-import com.thc.spradv2026winter.dto.PostimgDto;
 import com.thc.spradv2026winter.dto.PostingDto;
 import com.thc.spradv2026winter.mapper.PostingMapper;
 import com.thc.spradv2026winter.repository.PostingRepository;
-import com.thc.spradv2026winter.service.PostimgService;
 import com.thc.spradv2026winter.service.PostingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,29 +18,20 @@ public class PostingServiceImpl implements PostingService {
 
     final PostingRepository postingRepository;
     final PostingMapper postingMapper;
-    final PostimgService postimgService;
 
     @Override
-    public DefaultDto.CreateResDto create(PostingDto.CreateReqDto param) {
-
-        if(param.getImgs() != null && !param.getImgs().isEmpty()){
-            param.setImg(param.getImgs().get(0));
-        }
-
+    public DefaultDto.CreateResDto create(PostingDto.CreateReqDto param, Long reqUserId) {
+        param.setUserId(reqUserId);
         DefaultDto.CreateResDto res = postingRepository.save(param.toEntity()).toCreateResDto();
-
-        for(String img : param.getImgs()){
-            postimgService.create(PostimgDto.CreateReqDto.builder().postingId(res.getId()).img(img).build());
-        }
 
         return res;
     }
 
     @Override
-    public void update(PostingDto.UpdateReqDto param, Long userId) {
+    public void update(PostingDto.UpdateReqDto param, Long reqUserId) {
         Posting posting = postingRepository.findById(param.getId()).orElseThrow(() -> new RuntimeException("no data"));
 
-        if(!userId.equals(posting.getUserId())) {
+        if(!reqUserId.equals(posting.getUserId())) {
             throw new RuntimeException("you don't have permission to update this posting");
         }
 
@@ -51,23 +40,22 @@ public class PostingServiceImpl implements PostingService {
     }
 
     @Override
-    public void delete(PostingDto.UpdateReqDto param, Long userId) {
-        update(PostingDto.UpdateReqDto.builder().id(param.getId()).deleted(true).build(), userId);
+    public void delete(PostingDto.UpdateReqDto param, Long reqUserId) {
+        update(PostingDto.UpdateReqDto.builder().id(param.getId()).deleted(true).build(), reqUserId);
     }
 
     public PostingDto.DetailResDto get(DefaultDto.DetailReqDto param) {
         PostingDto.DetailResDto res = postingMapper.detail(param.getId());
-        System.out.println("res??? : " + res);
-        res.setImgs(postimgService.list(PostimgDto.ListReqDto.builder().deleted(false).postingId(res.getId()).build()));
+
         return res;
     }
 
     @Override
-    public PostingDto.DetailResDto detail(DefaultDto.DetailReqDto param) {
+    public PostingDto.DetailResDto detail(DefaultDto.DetailReqDto param, Long reqUserId) {
         return get(param);
     }
 
-    public List<PostingDto.DetailResDto> addlist(List<PostingDto.DetailResDto> list) {
+    public List<PostingDto.DetailResDto> addlist(List<PostingDto.DetailResDto> list, Long reqUserId) {
         List<PostingDto.DetailResDto> newList = new ArrayList<>();
         for (PostingDto.DetailResDto posting : list) {
             newList.add(get(DefaultDto.DetailReqDto.builder().id(posting.getId()).build()));
@@ -76,20 +64,20 @@ public class PostingServiceImpl implements PostingService {
     }
 
     @Override
-    public List<PostingDto.DetailResDto> list(PostingDto.ListReqDto param) {
+    public List<PostingDto.DetailResDto> list(PostingDto.ListReqDto param, Long reqUserId) {
         List<PostingDto.DetailResDto> list = new ArrayList<>();
         List<PostingDto.DetailResDto> postings = postingMapper.list(param);
-        return addlist(postings);
+        return addlist(postings, reqUserId);
     }
     @Override
-    public DefaultDto.PagedListResDto pagedList(PostingDto.PagedListReqDto param) {
+    public DefaultDto.PagedListResDto pagedList(PostingDto.PagedListReqDto param, Long reqUserId) {
         DefaultDto.PagedListResDto res = param.init(postingMapper.listCount(param));
-        res.setList(addlist(postingMapper.pagedList(param)));
+        res.setList(addlist(postingMapper.pagedList(param), reqUserId));
         return res;
     }
 
     @Override
-    public List<PostingDto.DetailResDto> scrollList(PostingDto.ScrollListReqDto param) {
-        return addlist(postingMapper.scrollList(param));
+    public List<PostingDto.DetailResDto> scrollList(PostingDto.ScrollListReqDto param, Long reqUserId) {
+        return addlist(postingMapper.scrollList(param), reqUserId);
     }
 }

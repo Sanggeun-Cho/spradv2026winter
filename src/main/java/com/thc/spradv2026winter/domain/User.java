@@ -20,16 +20,6 @@ public class User extends AuditingFields {
     @Setter String birth;
     @Setter String gender;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
-    private List<UserRoleType> userRoleType = new ArrayList<>();
-
-    public List<UserRoleType> getRoleList() {
-        if(!this.userRoleType.isEmpty()) {
-            return userRoleType;
-        }
-        return new ArrayList<>();
-    }
-
     protected User(){}
     private User(String username, String password, String name, String nick, String phone, String birth, String gender) {
         this.username = username;
