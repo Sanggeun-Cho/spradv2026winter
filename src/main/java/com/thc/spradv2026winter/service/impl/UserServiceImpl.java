@@ -81,6 +81,7 @@ public class UserServiceImpl implements UserService {
             roleType = RoleType.of("user", typeName);
             roleTypeRepository.save(roleType);
         }
+        //
 
         UserRoleType userRoleType = UserRoleType.of(newUser, roleType);
         userRoleTypeRepository.save(userRoleType);
