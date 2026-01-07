@@ -21,7 +21,6 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public DefaultDto.CreateResDto create(PermissionDto.CreateReqDto param, Long reqUserId) {
-        param.setUserId(reqUserId);
         DefaultDto.CreateResDto res = permissionRepository.save(param.toEntity()).toCreateResDto();
 
         return res;
@@ -30,10 +29,6 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public void update(PermissionDto.UpdateReqDto param, Long reqUserId) {
         Permission permission = permissionRepository.findById(param.getId()).orElseThrow(() -> new RuntimeException("no data"));
-
-        if(!reqUserId.equals(permission.getUserId())) {
-            throw new RuntimeException("you don't have permission to update this permission");
-        }
 
         permission.update(param);
         permissionRepository.save(permission);

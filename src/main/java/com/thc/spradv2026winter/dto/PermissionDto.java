@@ -11,13 +11,11 @@ public class PermissionDto {
 
     @Getter @Setter @NoArgsConstructor @AllArgsConstructor
     public static class CreateReqDto{
-        Long userId;
         String title;
         String content;
-        String img;
 
         public Permission toEntity(){
-            return Permission.of(getUserId(), getTitle(), getContent(), getImg());
+            return Permission.of(getTitle(), getContent());
         }
     }
 
@@ -25,33 +23,22 @@ public class PermissionDto {
     public static class UpdateReqDto extends DefaultDto.UpdateReqDto{
         String title;
         String content;
-        String img;
     }
     @Getter @Setter @NoArgsConstructor @AllArgsConstructor @SuperBuilder
     public static class DetailResDto extends DefaultDto.DetailResDto {
-        Long userId;
         String title;
         String content;
-        String img;
-        Integer countlike;
-
-        String userUsername;
-        String userName;
-        String userNick;
     }
     @Getter @Setter @NoArgsConstructor @AllArgsConstructor @SuperBuilder
     public static class ListReqDto extends DefaultDto.ListReqDto {
-        Long userId;
         String title;
     }
     @Getter @Setter @NoArgsConstructor @AllArgsConstructor @SuperBuilder
     public static class PagedListReqDto extends DefaultDto.PagedListReqDto {
-        Long userId;
         String title;
     }
     @Getter @Setter @NoArgsConstructor @AllArgsConstructor @SuperBuilder
     public static class ScrollListReqDto extends DefaultDto.ScrollListReqDto {
-        Long userId;
         String title;
     }
 }
