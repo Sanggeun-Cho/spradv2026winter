@@ -7,7 +7,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.util.List;
+
 public class PermissionDto {
+
+    public static String[][] targets = {
+            {"permission", "권한"}
+            , {"user", "사용자"}
+            , {"notice", "공지사항"}
+    };
 
     @Getter @Setter @NoArgsConstructor @AllArgsConstructor
     public static class CreateReqDto{
@@ -28,6 +36,12 @@ public class PermissionDto {
     public static class DetailResDto extends DefaultDto.DetailResDto {
         String title;
         String content;
+
+        // 이 권한이 가지고 있는 전체 권한 상세 목록
+        List<PermissiondetailDto.DetailResDto> details;
+
+        // 이 프로젝트에서 다루고 있는 권한 테이블 전체 목록
+        String[][] targets;
     }
     @Getter @Setter @NoArgsConstructor @AllArgsConstructor @SuperBuilder
     public static class ListReqDto extends DefaultDto.ListReqDto {

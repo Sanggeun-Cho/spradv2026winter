@@ -22,6 +22,11 @@ public class DefaultPageController {
         return "index"; //페이지컨트롤러 리턴값! src->resources->templates 아래에 있는 리턴값, index.html을 찾아서 파씽해줌!!
     }
 
+    @RequestMapping("/admin")
+    public String admin(){
+        return "admin";
+    }
+
     @ResponseBody
     @RequestMapping(value = "/image/{file_name:.+}", method = {RequestMethod.GET,RequestMethod.POST})
     public byte[] getImage(@PathVariable("file_name") String file_name, HttpServletRequest request) throws Exception {

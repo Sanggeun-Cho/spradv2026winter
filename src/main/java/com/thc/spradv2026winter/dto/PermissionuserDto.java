@@ -1,0 +1,44 @@
+package com.thc.spradv2026winter.dto;
+
+import com.thc.spradv2026winter.domain.Permissionuser;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
+
+public class PermissionuserDto {
+    @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+    public static class CreateReqDto{
+        Long permissionId;
+        Long userId;
+
+        public Permissionuser toEntity(){
+            return Permissionuser.of(getPermissionId(), getUserId());
+        }
+    }
+
+    @Getter @Setter @NoArgsConstructor @AllArgsConstructor @SuperBuilder
+    public static class UpdateReqDto extends DefaultDto.UpdateReqDto{
+        Long permissionId;
+        Long userId;
+    }
+    @Getter @Setter @NoArgsConstructor @AllArgsConstructor @SuperBuilder
+    public static class DetailResDto extends DefaultDto.DetailResDto {
+        Long permissionId;
+        Long userId;
+    }
+    @Getter @Setter @NoArgsConstructor @AllArgsConstructor @SuperBuilder
+    public static class ListReqDto extends DefaultDto.ListReqDto {
+        Long permissionId;
+        String target;
+        Long func;
+    }
+    @Getter @Setter @NoArgsConstructor @AllArgsConstructor @SuperBuilder
+    public static class PagedListReqDto extends DefaultDto.PagedListReqDto {
+        Long permissionId;
+        Long userId;
+    }
+    @Getter @Setter @NoArgsConstructor @AllArgsConstructor @SuperBuilder
+    public static class ScrollListReqDto extends DefaultDto.ScrollListReqDto {
+        Long permissionId;
+        Long userId;
+    }
+}

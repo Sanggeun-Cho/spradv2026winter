@@ -3,9 +3,11 @@ package com.thc.spradv2026winter.service.impl;
 import com.thc.spradv2026winter.domain.Permission;
 import com.thc.spradv2026winter.dto.DefaultDto;
 import com.thc.spradv2026winter.dto.PermissionDto;
+import com.thc.spradv2026winter.dto.PermissiondetailDto;
 import com.thc.spradv2026winter.mapper.PermissionMapper;
 import com.thc.spradv2026winter.repository.PermissionRepository;
 import com.thc.spradv2026winter.service.PermissionService;
+import com.thc.spradv2026winter.service.PermissiondetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,7 @@ public class PermissionServiceImpl implements PermissionService {
 
     final PermissionRepository permissionRepository;
     final PermissionMapper permissionMapper;
+    final PermissiondetailService permissiondetailService;
 
     @Override
     public DefaultDto.CreateResDto create(PermissionDto.CreateReqDto param, Long reqUserId) {
@@ -39,21 +42,24 @@ public class PermissionServiceImpl implements PermissionService {
         update(PermissionDto.UpdateReqDto.builder().id(param.getId()).deleted(true).build(), reqUserId);
     }
 
-    public PermissionDto.DetailResDto get(DefaultDto.DetailReqDto param) {
+    public PermissionDto.DetailResDto get(DefaultDto.DetailReqDto param, Long reqUserId) {
         PermissionDto.DetailResDto res = permissionMapper.detail(param.getId());
+
+        res.setDetails(permissiondetailService.list(PermissiondetailDto.ListReqDto.builder().deleted(false).permissionId(res.getId()).build(), reqUserId));
+        res.setTargets(PermissionDto.targets);
 
         return res;
     }
 
     @Override
     public PermissionDto.DetailResDto detail(DefaultDto.DetailReqDto param, Long reqUserId) {
-        return get(param);
+        return get(param, reqUserId);
     }
 
     public List<PermissionDto.DetailResDto> addlist(List<PermissionDto.DetailResDto> list, Long reqUserId) {
         List<PermissionDto.DetailResDto> newList = new ArrayList<>();
         for (PermissionDto.DetailResDto permission : list) {
-            newList.add(get(DefaultDto.DetailReqDto.builder().id(permission.getId()).build()));
+            newList.add(get(DefaultDto.DetailReqDto.builder().id(permission.getId()).build(), reqUserId));
         }
         return newList;
     }
