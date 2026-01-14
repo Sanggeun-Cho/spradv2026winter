@@ -1,11 +1,15 @@
 package com.thc.spradv2026winter.service.impl;
 
 import com.thc.spradv2026winter.domain.Permissionuser;
+import com.thc.spradv2026winter.domain.User;
 import com.thc.spradv2026winter.dto.DefaultDto;
 import com.thc.spradv2026winter.dto.PermissionuserDto;
+import com.thc.spradv2026winter.exception.NoMatchingDataException;
 import com.thc.spradv2026winter.mapper.PermissionuserMapper;
 import com.thc.spradv2026winter.repository.PermissionuserRepository;
+import com.thc.spradv2026winter.repository.UserRepository;
 import com.thc.spradv2026winter.service.PermissionuserService;
+import com.thc.spradv2026winter.service.PermittedService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,9 +22,24 @@ public class PermissionuserServiceImpl implements PermissionuserService {
 
     final PermissionuserRepository permissionuserRepository;
     final PermissionuserMapper permissionuserMapper;
+    final UserRepository userRepository;
+    final PermittedService permittedService;
+
+    String target = "permission";
 
     @Override
     public DefaultDto.CreateResDto create(PermissionuserDto.CreateReqDto param, Long reqUserId) {
+        permittedService.check(target, 110, reqUserId);
+
+        if(param.getUserId() == null){
+            User user = userRepository.findByUsername(param.getUsername());
+            if(user == null){
+                throw new NoMatchingDataException("no matching data");
+            } else {
+                param.setUserId(user.getId());
+            }
+        }
+
         Permissionuser permissionuser = permissionuserRepository.findByPermissionIdAndUserId(param.getPermissionId(), param.getUserId());
         if (permissionuser != null) {
             return permissionuser.toCreateResDto();
@@ -33,6 +52,8 @@ public class PermissionuserServiceImpl implements PermissionuserService {
 
     @Override
     public void update(PermissionuserDto.UpdateReqDto param, Long reqUserId) {
+        permittedService.check(target, 120, reqUserId);
+
         Permissionuser permissionuser = permissionuserRepository.findById(param.getId()).orElseThrow(() -> new RuntimeException("no data"));
 
         permissionuser.update(param);
@@ -45,6 +66,8 @@ public class PermissionuserServiceImpl implements PermissionuserService {
     }
 
     public PermissionuserDto.DetailResDto get(DefaultDto.DetailReqDto param, Long reqUserId) {
+        permittedService.check(target, 200, reqUserId);
+
         PermissionuserDto.DetailResDto res = permissionuserMapper.detail(param.getId());
 
         return res;

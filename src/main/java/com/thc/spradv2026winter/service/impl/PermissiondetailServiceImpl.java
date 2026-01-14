@@ -6,6 +6,7 @@ import com.thc.spradv2026winter.dto.PermissiondetailDto;
 import com.thc.spradv2026winter.mapper.PermissiondetailMapper;
 import com.thc.spradv2026winter.repository.PermissiondetailRepository;
 import com.thc.spradv2026winter.service.PermissiondetailService;
+import com.thc.spradv2026winter.service.PermittedService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,9 +19,14 @@ public class PermissiondetailServiceImpl implements PermissiondetailService {
 
     final PermissiondetailRepository permissiondetailRepository;
     final PermissiondetailMapper permissiondetailMapper;
+    final PermittedService permittedService;
+    String target = "permission";
 
     @Override
     public void toggle(PermissiondetailDto.ToggleReqDto param, Long reqUserId) {
+        permittedService.check(target, 110, reqUserId);
+        permittedService.check(target, 120, reqUserId);
+
         Permissiondetail permissiondetail = permissiondetailRepository.findByPermissionIdAndTargetAndFunc(param.getPermissionId(), param.getTarget(), param.getFunc());
 
         if(permissiondetail != null) {
@@ -39,6 +45,8 @@ public class PermissiondetailServiceImpl implements PermissiondetailService {
 
     @Override
     public DefaultDto.CreateResDto create(PermissiondetailDto.CreateReqDto param, Long reqUserId) {
+        permittedService.check(target, 110, reqUserId);
+
         Permissiondetail permissiondetail = permissiondetailRepository.findByPermissionIdAndTargetAndFunc(param.getPermissionId(), param.getTarget(), param.getFunc());
         if (permissiondetail != null) {
             return permissiondetail.toCreateResDto();
@@ -51,6 +59,8 @@ public class PermissiondetailServiceImpl implements PermissiondetailService {
 
     @Override
     public void update(PermissiondetailDto.UpdateReqDto param, Long reqUserId) {
+        permittedService.check(target, 120, reqUserId);
+
         Permissiondetail permissiondetail = permissiondetailRepository.findById(param.getId()).orElseThrow(() -> new RuntimeException("no data"));
 
         permissiondetail.update(param);
@@ -63,6 +73,8 @@ public class PermissiondetailServiceImpl implements PermissiondetailService {
     }
 
     public PermissiondetailDto.DetailResDto get(DefaultDto.DetailReqDto param, Long reqUserId) {
+        permittedService.check(target, 200, reqUserId);
+
         PermissiondetailDto.DetailResDto res = permissiondetailMapper.detail(param.getId());
 
         return res;

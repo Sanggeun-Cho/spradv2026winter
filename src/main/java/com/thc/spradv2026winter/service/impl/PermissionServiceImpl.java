@@ -8,6 +8,7 @@ import com.thc.spradv2026winter.mapper.PermissionMapper;
 import com.thc.spradv2026winter.repository.PermissionRepository;
 import com.thc.spradv2026winter.service.PermissionService;
 import com.thc.spradv2026winter.service.PermissiondetailService;
+import com.thc.spradv2026winter.service.PermittedService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,9 +22,20 @@ public class PermissionServiceImpl implements PermissionService {
     final PermissionRepository permissionRepository;
     final PermissionMapper permissionMapper;
     final PermissiondetailService permissiondetailService;
+    final PermittedService permittedService;
+
+    String target = "permission";
+
+    @Override
+    public List<String> access(Long reqUserId) {
+        return permissionMapper.access(reqUserId);
+    }
+
+    /**/
 
     @Override
     public DefaultDto.CreateResDto create(PermissionDto.CreateReqDto param, Long reqUserId) {
+        permittedService.check(target, 110, reqUserId);
         DefaultDto.CreateResDto res = permissionRepository.save(param.toEntity()).toCreateResDto();
 
         return res;
@@ -31,6 +43,7 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public void update(PermissionDto.UpdateReqDto param, Long reqUserId) {
+        permittedService.check(target, 120, reqUserId);
         Permission permission = permissionRepository.findById(param.getId()).orElseThrow(() -> new RuntimeException("no data"));
 
         permission.update(param);
@@ -43,6 +56,7 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     public PermissionDto.DetailResDto get(DefaultDto.DetailReqDto param, Long reqUserId) {
+        permittedService.check(target, 200, reqUserId);
         PermissionDto.DetailResDto res = permissionMapper.detail(param.getId());
 
         res.setDetails(permissiondetailService.list(PermissiondetailDto.ListReqDto.builder().deleted(false).permissionId(res.getId()).build(), reqUserId));
